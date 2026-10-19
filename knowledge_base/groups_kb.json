@@ -1,0 +1,81 @@
+{
+  "function": "groups",
+  "description": "Knowledge base for suggesting and matching study groups based on student profiles",
+  "matching_criteria": {
+    "primary_factors": [
+      {"factor": "department", "weight": 0.3, "description": "Same department students share course material and understanding"},
+      {"factor": "level", "weight": 0.25, "description": "Students at similar academic levels face similar challenges"},
+      {"factor": "courses", "weight": 0.25, "description": "Shared enrolled courses create natural study partnerships"},
+      {"factor": "learning_style", "weight": 0.2, "description": "Compatible learning styles improve group dynamics"}
+    ],
+    "secondary_factors": [
+      {"factor": "study_hours", "description": "Similar study commitment levels reduce friction"},
+      {"factor": "performance_level", "description": "Mixed performance can enable peer teaching"},
+      {"factor": "availability", "description": "Overlapping free time is essential for group meetings"}
+    ]
+  },
+  "group_types": [
+    {
+      "type": "Course Study Group",
+      "ideal_size": "3-5 members",
+      "purpose": "Focus on a specific course, share notes, solve problems together",
+      "best_for": "Students taking the same course who want to improve understanding",
+      "structure": "Weekly meetings, rotating topic leaders, shared note documents"
+    },
+    {
+      "type": "Exam Prep Group",
+      "ideal_size": "4-6 members",
+      "purpose": "Intensive preparation for upcoming exams",
+      "best_for": "Students with exams in the same course within 2 weeks",
+      "structure": "Daily or every-other-day sessions, practice questions, mock exams"
+    },
+    {
+      "type": "Project Team",
+      "ideal_size": "3-4 members",
+      "purpose": "Collaborate on course projects or assignments",
+      "best_for": "Students with complementary skills working on group projects",
+      "structure": "Regular check-ins, clear task division, shared workspace"
+    },
+    {
+      "type": "Accountability Partners",
+      "ideal_size": "2-3 members",
+      "purpose": "Hold each other accountable for study goals and habits",
+      "best_for": "Students who struggle with consistency and motivation",
+      "structure": "Daily check-ins, shared goal tracking, mutual encouragement"
+    },
+    {
+      "type": "Cross-Discipline Group",
+      "ideal_size": "4-5 members",
+      "purpose": "Diverse perspectives from different departments for broader learning",
+      "best_for": "Students interested in interdisciplinary projects or research",
+      "structure": "Bi-weekly meetings, knowledge sharing sessions, collaborative projects"
+    }
+  ],
+  "compatibility_rules": {
+    "high_compatibility": [
+      "Same department + same level + shared courses",
+      "Similar learning styles + similar study hours",
+      "Complementary strengths (one strong in theory, another in practice)"
+    ],
+    "moderate_compatibility": [
+      "Same department but different levels (mentoring opportunity)",
+      "Different learning styles but same courses (diverse perspectives)",
+      "Similar performance levels with different schedules"
+    ],
+    "low_compatibility": [
+      "Very different study commitment levels",
+      "No shared courses or academic interests",
+      "Conflicting schedules with no overlap"
+    ]
+  },
+  "group_success_tips": [
+    "Set clear expectations and ground rules from the start",
+    "Assign a rotating group leader for each session",
+    "Create a shared document or chat group for communication",
+    "Each member should prepare before group sessions",
+    "Start and end sessions on time — respect everyone's schedule",
+    "Balance teaching and learning — everyone contributes",
+    "Address conflicts early and constructively",
+    "Celebrate group achievements together"
+  ]
+}

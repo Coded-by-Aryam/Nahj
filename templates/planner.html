@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}{{ t('planner_title') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('planner_title') }}</h1>
+        <p class="page-subtitle">{{ t('planner_subtitle') }}</p>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('generateModal').classList.add('active')">{{ t('generate_ai_plan') }}</button>
+</div>
+
+<div class="grid-2">
+    <div>
+        <!-- Generated Plan Display -->
+        <div class="card" id="planDisplayCard">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('latest_plan') }}</h3>
+            </div>
+            <div id="planContent">
+                {% if plans %}
+                    {% set latest = plans[0] %}
+                    <div style="margin-bottom:12px;">
+                        <span class="badge badge-info">{{ latest.plan_type }}</span>
+                        <span style="font-size:0.78rem; color:var(--text-muted); margin-{% if dir == 'rtl' %}right{% else %}left{% endif %}:8px;">{{ latest.created_at }}</span>
+                    </div>
+                    <div id="planText" style="font-size:0.88rem; line-height:1.8; color:var(--text-light);"></div>
+                    <script>
+                        try {
+                            const raw = {{ latest.plan_data | tojson | safe }};
+                            const planData = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                            const content = planData.content || '';
+                            document.getElementById('planText').innerHTML = content
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                .replace(/#{1,3}\s?(.*?)(\n|$)/g, '<h4 style="margin:12px 0 4px; color:var(--text);">$1</h4>')
+                                .replace(/\n/g, '<br>');
+                        } catch(e) {
+                            document.getElementById('planText').textContent = '{{ t('plan_could_not_render') }}';
+                        }
+                    </script>
+                {% else %}
+                    <div class="empty-state" style="padding:40px;">
+                        <div class="empty-state-icon">📅</div>
+                        <p class="empty-state-text">{{ t('no_plans_yet') }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Plan History -->
+        {% if plans|length > 1 %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('plan_history') }}</h3>
+            </div>
+            {% for plan in plans[1:] %}
+            <div style="border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; overflow:hidden;">
+                <div onclick="const bd=this.nextElementSibling; bd.style.display=bd.style.display==='none'?'block':'none'; this.querySelector('.hi-arrow').textContent=bd.style.display==='none'?'▶':'▼';" style="padding:12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <div>
+                        <strong style="font-size:0.88rem;">{{ t('plan_word') }} {{ plan.plan_type }}</strong>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin:2px 0 0;">{{ plan.created_at }}</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="badge badge-info">{{ plan.plan_type }}</span>
+                        <span class="hi-arrow" style="font-size:0.7rem; color:var(--text-muted);">▶</span>
+                    </div>
+                </div>
+                <div style="display:none; padding:12px 14px; border-top:1px solid var(--border); font-size:0.85rem; line-height:1.7; color:var(--text-light);">
+                    <script>
+                        (function(){
+                            try {
+                                const raw = {{ plan.plan_data | tojson | safe }};
+                                const pd = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                                const c = pd.content || '';
+                                const el = document.currentScript.parentElement;
+                                el.innerHTML = c.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/#{1,3}\s?(.*?)(\n|$)/g,'<h4 style="margin:10px 0 4px;color:var(--text);">$1</h4>').replace(/\n/g,'<br>');
+                            } catch(e) { document.currentScript.parentElement.textContent = '{{ t('plan_could_not_load') }}'; }
+                        })();
+                    </script>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('enrolled_courses_label') }}</h3>
+            </div>
+            {% if enrolled_courses %}
+                {% for course in enrolled_courses %}
+                <div style="padding:10px 14px; border-bottom:1px solid var(--border);">
+                    <strong style="font-size:0.88rem;">{{ course.course_name }}</strong>
+                    <p style="font-size:0.78rem; color:var(--text-muted);">{{ course.schedule }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align:center; padding:20px; color:var(--text-muted);">
+                    {{ t('enroll_first') }}
+                    <br><a href="{{ url_for('courses') }}" class="btn btn-sm btn-rose" style="margin-top:8px;">{{ t('browse_courses') }}</a>
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('tips') }}</h3>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-light); line-height:1.8;">
+                {{ t('planner_tip_text') }}
+                <br><br>{{ t('planner_tip_profile') }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Plan Modal -->
+<div class="modal-overlay" id="generateModal">
+    <div class="modal">
+        <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">&times;</button>
+        <h2 class="modal-title">{{ t('create_study_plan') }}</h2>
+        <div class="form-group">
+            <label class="form-label">{{ t('plan_type') }}</label>
+            <select id="planType" class="form-control">
+                <option value="daily">{{ t('plan_daily') }}</option>
+                <option value="weekly">{{ t('plan_weekly') }}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">{{ t('available_hours_per_day') }}</label>
+            <input type="number" id="studyHours" class="form-control" value="4" min="1" max="12">
+        </div>
+        <div class="form-group">
+            <label class="form-label">{{ t('focus_priority') }}</label>
+            <select id="planFocus" class="form-control">
+                <option value="balanced">{{ t('focus_balanced') }}</option>
+                <option value="exams">{{ t('focus_exams') }}</option>
+                <option value="assignments">{{ t('focus_assignments') }}</option>
+            </select>
+        </div>
+        <button id="genBtn" class="btn btn-primary btn-block" style="margin-top:10px;" onclick="generatePlan()">{{ t('generate_plan_btn') }}</button>
+        <p id="genStatus" style="text-align:center; font-size:0.82rem; color:var(--text-muted); margin-top:8px; display:none;">{{ t('generating_your_plan') }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function generatePlan() {
+    const btn = document.getElementById('genBtn');
+    const status = document.getElementById('genStatus');
+    btn.disabled = true;
+    btn.textContent = '{{ t('generating_plan') }}';
+    status.style.display = 'block';
+
+    try {
+        const res = await fetch('/api/ai/generate-plan', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                plan_type: document.getElementById('planType').value,
+                study_hours: parseInt(document.getElementById('studyHours').value) || 4,
+                focus: document.getElementById('planFocus').value
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            status.textContent = data.error || '{{ t('plan_error') }}';
+            status.style.color = 'var(--danger)';
+        }
+    } catch(e) {
+        status.textContent = '{{ t('connection_error') }}';
+        status.style.color = 'var(--danger)';
+    }
+    btn.disabled = false;
+    btn.textContent = '{{ t('generate_plan_btn') }}';
+    setTimeout(() => { status.style.display = 'none'; status.style.color = ''; }, 5000);
+}
+</script>
+{% endblock %}

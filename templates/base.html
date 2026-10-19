@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('app_name') }} — {% block title %}{{ t('nav_dashboard') }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .lang-toggle{
+            display:inline-flex;align-items:center;justify-content:center;
+            width:34px;height:34px;border-radius:50%;border:1px solid var(--border);
+            background:var(--white);color:var(--text);font-weight:700;font-size:.78rem;
+            cursor:pointer;text-decoration:none;transition:all .2s;
+            margin: 0 0 14px;
+        }
+        .lang-toggle:hover{background:var(--rose-light);border-color:var(--primary);color:var(--primary);}
+        .sidebar-top{display:flex;align-items:center;justify-content:space-between;}
+    </style>
+</head>
+<body>
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="sidebar-logo">{{ t('app_name') }}</div>
+            <a href="{{ url_for('set_language', code='en' if lang == 'ar' else 'ar') }}"
+               class="lang-toggle"
+               title="{{ t('lang_toggle_title') }}">{{ t('lang_toggle') }}</a>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon">🏠</span> {{ t('nav_dashboard') }}
+            </a></li>
+            <li><a href="{{ url_for('planner') }}" class="{% if request.endpoint == 'planner' %}active{% endif %}">
+                <span class="nav-icon">📅</span> {{ t('nav_planner') }}
+            </a></li>
+            <li><a href="{{ url_for('tasks') }}" class="{% if request.endpoint == 'tasks' %}active{% endif %}">
+                <span class="nav-icon">✅</span> {{ t('nav_tasks') }}
+            </a></li>
+            <li><a href="{{ url_for('courses') }}" class="{% if request.endpoint == 'courses' %}active{% endif %}">
+                <span class="nav-icon">📚</span> {{ t('nav_courses') }}
+            </a></li>
+            <li><a href="{{ url_for('performance') }}" class="{% if request.endpoint == 'performance' %}active{% endif %}">
+                <span class="nav-icon">📊</span> {{ t('nav_performance') }}
+            </a></li>
+            <li><a href="{{ url_for('recommendations') }}" class="{% if request.endpoint == 'recommendations' %}active{% endif %}">
+                <span class="nav-icon">🤖</span> {{ t('nav_recommendations') }}
+            </a></li>
+            <hr class="sidebar-divider">
+            <li><a href="{{ url_for('community') }}" class="{% if request.endpoint == 'community' %}active{% endif %}">
+                <span class="nav-icon">👥</span> {{ t('nav_community') }}
+            </a></li>
+            <li><a href="{{ url_for('notifications') }}" class="{% if request.endpoint == 'notifications' %}active{% endif %}">
+                <span class="nav-icon">🔔</span> {{ t('nav_notifications') }}
+                <span id="notif-badge" style="display:none; background:var(--danger); color:#fff; font-size:0.65rem; padding:2px 7px; border-radius:20px; {% if dir == 'rtl' %}margin-right:auto;{% else %}margin-left:auto;{% endif %}"></span>
+            </a></li>
+            <hr class="sidebar-divider">
+            <li><a href="{{ url_for('profile') }}" class="{% if request.endpoint == 'profile' %}active{% endif %}">
+                <span class="nav-icon">👤</span> {{ t('nav_profile') }}
+            </a></li>
+            <li><a href="{{ url_for('logout') }}">
+                <span class="nav-icon">🚪</span> {{ t('nav_logout') }}
+            </a></li>
+        </ul>
+
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">{{ session.get('username', 'م')[0]|upper }}</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">{{ session.get('username', 'مستخدم') }}</div>
+                <div class="sidebar-user-email">{{ session.get('email', '') }}</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+                {{ message }}
+                <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+window.NAHJ_LANG = "{{ lang }}";
+async function checkNotifications() {
+    try {
+        const res = await fetch('/api/notifications/count');
+        const data = await res.json();
+        const badge = document.getElementById('notif-badge');
+        if (data.count > 0) {
+            badge.style.display = 'inline';
+            badge.textContent = data.count;
+        } else {
+            badge.style.display = 'none';
+        }
+    } catch(e) {}
+}
+checkNotifications();
+setInterval(checkNotifications, 30000);
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

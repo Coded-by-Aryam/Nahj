@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}{{ t('courses_title') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('courses_title') }}</h1>
+        <p class="page-subtitle">
+            {% if show_all %}
+                {{ t('show_all_levels') }}
+            {% else %}
+                {{ t('show_my_level') }} ({{ t('level') }} {{ user_level }})
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="filters">
+    <a href="{{ url_for('courses') }}" class="filter-btn {% if not show_all %}active{% endif %}">{{ t('my_level') }} ({{ user_level }})</a>
+    <a href="{{ url_for('courses', show_all=1) }}" class="filter-btn {% if show_all %}active{% endif %}">{{ t('all_levels') }}</a>
+</div>
+
+{% if not courses %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📚</div>
+        <p class="empty-state-text">
+            {{ t('no_courses_for_level') }}
+            <br>
+            <a href="{{ url_for('profile') }}">{{ t('update_level_link') }}</a> {{ t('in_profile') }} {{ t('or') }}
+            <a href="{{ url_for('courses', show_all=1) }}">{{ t('view_all_courses_link') }}</a>.
+        </p>
+    </div>
+{% endif %}
+
+<div class="groups-grid">
+    {% for course in courses %}
+    <div class="course-card" id="card-{{ course.id }}" style="{% if course.id in enrolled_ids %}cursor:pointer; position:relative;{% endif %}" {% if course.id in enrolled_ids %}onclick="openCourse(event, {{ course.id }})"{% endif %}>
+        {% if course.id in enrolled_ids %}
+        <div style="position:absolute; top:10px; {% if dir == 'rtl' %}left{% else %}right{% endif %}:10px; font-size:0.7rem; color:var(--primary); font-weight:600; opacity:0.7;">
+            {% if lang == 'ar' %}اضغط للفتح{% else %}Click to open{% endif %}
+        </div>
+        {% endif %}
+        <span class="course-code">{{ course.course_code }}</span>
+        <div class="course-name">{{ course.course_name }}</div>
+        <div class="course-detail">👤 {{ course.instructor }}</div>
+        <div class="course-detail">🕐 {{ course.schedule }}</div>
+        <div class="course-detail">📖 {{ course.credit_hours }} {{ t('credit_hours') }}</div>
+        <div class="course-detail">📊 {{ t('level') }} {{ course.level }}</div>
+        <div style="margin-top:14px;" id="course-actions-{{ course.id }}">
+            {% if course.id in enrolled_ids %}
+            <a href="{{ url_for('course_detail', course_id=course.id) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()">{{ t('open') }}</a>
+            <button onclick="event.stopPropagation(); dropCourse(this, {{ course.id }})" class="btn btn-sm btn-danger">{{ t('drop_enrollment') }}</button>
+            <span class="badge badge-completed" style="margin-{% if dir == 'rtl' %}right{% else %}left{% endif %}:8px;" id="enrolled-badge-{{ course.id }}">{{ t('enrolled') }}</span>
+            {% else %}
+            <button onclick="enrollCourse(this, {{ course.id }})" class="btn btn-sm btn-primary">{{ t('enroll') }}</button>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const T_ENROLL       = '{{ t("enroll") }}';
+const T_DROP         = '{{ t("drop_enrollment") }}';
+const T_ENROLLED     = '{{ t("enrolled") }}';
+const T_OPEN         = '{{ t("open") }}';
+const T_CLICK_OPEN   = '{{ "اضغط للفتح" if lang == "ar" else "Click to open" }}';
+const COURSES_DIR    = '{{ dir }}';
+const COURSES_LANG   = '{{ lang }}';
+
+function openCourse(event, courseId) {
+    window.location.href = '/courses/' + courseId;
+}
+
+async function enrollCourse(btn, courseId) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+        const res = await fetch('/courses/enroll/' + courseId, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            const actionsDiv = document.getElementById('course-actions-' + courseId);
+            const margin = COURSES_DIR === 'rtl' ? 'margin-right' : 'margin-left';
+            const posKey  = COURSES_DIR === 'rtl' ? 'left' : 'right';
+            actionsDiv.innerHTML =
+                `<a href="/courses/${courseId}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()">${T_OPEN}</a> ` +
+                `<button onclick="event.stopPropagation(); dropCourse(this, ${courseId})" class="btn btn-sm btn-danger">${T_DROP}</button> ` +
+                `<span class="badge badge-completed" style="${margin}:8px;">${T_ENROLLED}</span>`;
+            // Make card clickable
+            const card = document.getElementById('card-' + courseId);
+            if (card) {
+                card.style.cursor = 'pointer';
+                card.setAttribute('onclick', `openCourse(event, ${courseId})`);
+                // Add hint label
+                const hint = document.createElement('div');
+                hint.style.cssText = `position:absolute; top:10px; ${posKey}:10px; font-size:0.7rem; color:var(--primary); font-weight:600; opacity:0.7;`;
+                hint.textContent = T_CLICK_OPEN;
+                card.style.position = 'relative';
+                card.insertBefore(hint, card.firstChild);
+            }
+        } else {
+            btn.disabled = false;
+            btn.textContent = T_ENROLL;
+        }
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = T_ENROLL;
+    }
+}
+
+async function dropCourse(btn, courseId) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+        const res = await fetch('/courses/drop/' + courseId, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            const actionsDiv = document.getElementById('course-actions-' + courseId);
+            actionsDiv.innerHTML =
+                `<button onclick="enrollCourse(this, ${courseId})" class="btn btn-sm btn-primary">${T_ENROLL}</button>`;
+            // Remove clickability
+            const card = document.getElementById('card-' + courseId);
+            if (card) {
+                card.style.cursor = '';
+                card.removeAttribute('onclick');
+                const hint = card.querySelector('div[style*="Click to open"], div[style*="اضغط للفتح"]');
+                if (hint) hint.remove();
+            }
+        } else {
+            btn.disabled = false;
+            btn.textContent = T_DROP;
+        }
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = T_DROP;
+    }
+}
+</script>
+{% endblock %}

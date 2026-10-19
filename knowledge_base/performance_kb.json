@@ -1,0 +1,77 @@
+{
+  "function": "analyze_performance",
+  "description": "Analyzes academic performance and provides scoring with detailed insights",
+  "performance_metrics": {
+    "study_hours_weekly": {
+      "excellent": {"range": "15+", "score_contribution": 25},
+      "good": {"range": "10-15", "score_contribution": 20},
+      "average": {"range": "5-10", "score_contribution": 12},
+      "below_average": {"range": "2-5", "score_contribution": 6},
+      "poor": {"range": "0-2", "score_contribution": 2}
+    },
+    "completion_rate": {
+      "excellent": {"range": "90-100%", "score_contribution": 30},
+      "good": {"range": "75-90%", "score_contribution": 24},
+      "average": {"range": "50-75%", "score_contribution": 15},
+      "below_average": {"range": "25-50%", "score_contribution": 8},
+      "poor": {"range": "0-25%", "score_contribution": 3}
+    },
+    "consistency_score": {
+      "excellent": {"range": "85-100%", "score_contribution": 25},
+      "good": {"range": "65-85%", "score_contribution": 20},
+      "average": {"range": "40-65%", "score_contribution": 12},
+      "below_average": {"range": "20-40%", "score_contribution": 6},
+      "poor": {"range": "0-20%", "score_contribution": 2}
+    },
+    "task_priority_management": {
+      "excellent": {"description": "High-priority tasks completed first and on time", "score_contribution": 20},
+      "good": {"description": "Most high-priority tasks done on time", "score_contribution": 16},
+      "average": {"description": "Some tasks completed regardless of priority", "score_contribution": 10},
+      "below_average": {"description": "Frequently misses high-priority deadlines", "score_contribution": 5},
+      "poor": {"description": "No priority management observed", "score_contribution": 1}
+    }
+  },
+  "performance_levels": [
+    {
+      "level": "Outstanding",
+      "score_range": "85-100",
+      "color": "#4CAF50",
+      "description": "You are performing exceptionally well. Your dedication and consistency are paying off.",
+      "next_steps": "Focus on maintaining this level. Consider mentoring peers or taking on leadership roles in study groups."
+    },
+    {
+      "level": "Good",
+      "score_range": "70-84",
+      "color": "#8BC34A",
+      "description": "Solid performance with room for improvement in specific areas.",
+      "next_steps": "Identify your weakest metric and focus improvement efforts there. Small improvements can push you to outstanding."
+    },
+    {
+      "level": "Average",
+      "score_range": "50-69",
+      "color": "#FF9800",
+      "description": "You're on track but there are clear areas that need attention.",
+      "next_steps": "Build consistency in your study routine. Focus on completing tasks on time and increasing daily study hours."
+    },
+    {
+      "level": "Below Average",
+      "score_range": "30-49",
+      "color": "#FF5722",
+      "description": "Your performance needs significant improvement. Don't worry — we can build a plan to help.",
+      "next_steps": "Start with small, daily study goals. Seek help from peers or tutors. Use the AI planner to structure your time."
+    },
+    {
+      "level": "Critical",
+      "score_range": "0-29",
+      "color": "#F44336",
+      "description": "Immediate attention needed. Your academic progress is at risk.",
+      "next_steps": "Schedule a meeting with your academic advisor. Start with just 30 minutes of focused study daily. Join a study group for support."
+    }
+  ],
+  "trend_analysis": {
+    "improving": "Your performance is trending upward. Keep up the positive momentum!",
+    "stable": "Your performance is consistent. Consider pushing for the next level.",
+    "declining": "Your performance has been declining. Let's identify what's changed and address it.",
+    "fluctuating": "Your performance varies significantly. Building a consistent routine will help stabilize results."
+  }
+}

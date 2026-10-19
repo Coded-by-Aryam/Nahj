@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_name }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ course.course_name }}</h1>
+        <p class="page-subtitle">
+            <span style="background:var(--primary);color:#fff;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;{% if dir == 'rtl' %}margin-left:8px{% else %}margin-right:8px{% endif %}">{{ course.course_code }}</span>
+            {% if lang == 'ar' %}مادة مسجّلة{% else %}Enrolled Course{% endif %}
+        </p>
+    </div>
+    <a href="{{ url_for('courses') }}" class="btn btn-sm btn-outline">
+        {% if dir == 'rtl' %}← {% endif %}{{ t('back') }}{% if dir != 'rtl' %} →{% endif %}
+    </a>
+</div>
+
+<!-- Course Info Card -->
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:24px;">
+    <div class="card">
+        <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">
+            📋 {% if lang == 'ar' %}معلومات المادة{% else %}Course Information{% endif %}
+        </h3>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; gap:10px; padding:10px; background:var(--bg-muted,#f9f5f3); border-radius:8px;">
+                <span style="font-size:1.3rem;">👤</span>
+                <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">{% if lang == 'ar' %}الأستاذ{% else %}Instructor{% endif %}</div>
+                    <div style="font-weight:600;">{{ course.instructor }}</div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:10px; background:var(--bg-muted,#f9f5f3); border-radius:8px;">
+                <span style="font-size:1.3rem;">🕐</span>
+                <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">{% if lang == 'ar' %}الجدول{% else %}Schedule{% endif %}</div>
+                    <div style="font-weight:600;">{{ course.schedule }}</div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:10px; background:var(--bg-muted,#f9f5f3); border-radius:8px;">
+                <span style="font-size:1.3rem;">📖</span>
+                <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">{% if lang == 'ar' %}الساعات المعتمدة{% else %}Credit Hours{% endif %}</div>
+                    <div style="font-weight:600;">{{ course.credit_hours }} {{ t('credit_hours') }}</div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:10px; background:var(--bg-muted,#f9f5f3); border-radius:8px;">
+                <span style="font-size:1.3rem;">📊</span>
+                <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">{{ t('level') }}</div>
+                    <div style="font-weight:600;">{{ t('level') }} {{ course.level }}</div>
+                </div>
+            </div>
+            {% if course.department %}
+            <div style="display:flex; align-items:center; gap:10px; padding:10px; background:var(--bg-muted,#f9f5f3); border-radius:8px;">
+                <span style="font-size:1.3rem;">🏫</span>
+                <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">{{ t('department') }}</div>
+                    <div style="font-weight:600;">{{ course.department }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Enrollment Info + Quick Actions -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+        <div class="card">
+            <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">
+                ✅ {% if lang == 'ar' %}معلومات التسجيل{% else %}Enrollment Info{% endif %}
+            </h3>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="padding:10px; background:var(--bg-muted,#f9f5f3); border-radius:8px;">
+                    <div style="font-size:0.75rem; color:var(--text-muted);">{% if lang == 'ar' %}الفصل الدراسي{% else %}Semester{% endif %}</div>
+                    <div style="font-weight:600;">{{ enrollment.semester }}</div>
+                </div>
+                <div style="padding:10px; background:var(--bg-muted,#f9f5f3); border-radius:8px;">
+                    <div style="font-size:0.75rem; color:var(--text-muted);">{% if lang == 'ar' %}تاريخ التسجيل{% else %}Enrolled On{% endif %}</div>
+                    <div style="font-weight:600;">{{ enrollment.enrolled_at }}</div>
+                </div>
+                <div style="padding:10px; background:#e8f5e9; border-radius:8px; border-{% if dir == 'rtl' %}right{% else %}left{% endif %}:4px solid #4caf50;">
+                    <span style="color:#2e7d32; font-weight:600;">
+                        ✓ {% if lang == 'ar' %}أنت مسجّل في هذه المادة{% else %}You are enrolled in this course{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">
+                ⚡ {% if lang == 'ar' %}إجراءات سريعة{% else %}Quick Actions{% endif %}
+            </h3>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <a href="{{ url_for('tasks') }}" class="btn btn-rose btn-block">
+                    📋 {% if lang == 'ar' %}إضافة مهمة لهذه المادة{% else %}Add Task for this Course{% endif %}
+                </a>
+                <a href="{{ url_for('planner') }}" class="btn btn-rose btn-block">
+                    📅 {% if lang == 'ar' %}جدولة وقت مذاكرة{% else %}Schedule Study Time{% endif %}
+                </a>
+                <a href="{{ url_for('community') }}" class="btn btn-rose btn-block">
+                    👥 {% if lang == 'ar' %}البحث عن مجموعة دراسية{% else %}Find a Study Group{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Related Tasks -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            📋 {% if lang == 'ar' %}المهام المرتبطة بالمادة{% else %}Related Tasks{% endif %}
+        </h3>
+        <a href="{{ url_for('tasks') }}" class="btn btn-sm btn-rose">{{ t('view_all') }}</a>
+    </div>
+    {% if related_tasks %}
+        <div style="display:flex; flex-direction:column; gap:8px;">
+        {% for task in related_tasks %}
+        <div class="task-item">
+            <div class="task-checkbox {% if task.status == 'completed' %}checked{% endif %}">
+                {% if task.status == 'completed' %}✓{% endif %}
+            </div>
+            <div class="task-info">
+                <div class="task-title {% if task.status == 'completed' %}completed{% endif %}">{{ task.title }}</div>
+                <div class="task-meta">
+                    <span>📅 {{ task.deadline if task.deadline else t('no_deadline') }}</span>
+                    <span class="badge badge-{{ task.priority }}">{{ task.priority }}</span>
+                    <span class="badge badge-{% if task.status == 'completed' %}completed{% else %}pending{% endif %}">{{ task.status }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state" style="padding:30px 0;">
+            <div class="empty-state-icon">📋</div>
+            <p class="empty-state-text">
+                {% if lang == 'ar' %}لا توجد مهام مرتبطة بهذه المادة حتى الآن.{% else %}No tasks linked to this course yet.{% endif %}
+                <br>
+                <a href="{{ url_for('tasks') }}">{% if lang == 'ar' %}أضف مهمة الآن{% else %}Add a task now{% endif %}</a>
+            </p>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

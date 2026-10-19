@@ -1,0 +1,92 @@
+{
+  "function": "recommend_study_pattern",
+  "description": "Recommends optimal study patterns and techniques based on learning style and behavior",
+  "study_patterns": [
+    {
+      "name": "Pomodoro Technique",
+      "duration": "25 min study + 5 min break, 4 cycles then 15 min break",
+      "best_for": ["Deadline Sprinters", "Students with focus issues", "Heavy workload periods"],
+      "learning_styles": ["visual", "reading", "practical"],
+      "description": "Short focused bursts followed by breaks. Keeps attention sharp and prevents burnout.",
+      "how_to": "Set a timer for 25 minutes. Focus on one task only. Take a 5-minute break. After 4 rounds, take a 15-minute break."
+    },
+    {
+      "name": "Spaced Repetition",
+      "duration": "Review at increasing intervals: 1 day, 3 days, 7 days, 14 days",
+      "best_for": ["Exam preparation", "Memorization-heavy courses", "Consistent Achievers"],
+      "learning_styles": ["reading", "visual"],
+      "description": "Review material at gradually increasing intervals to strengthen long-term memory.",
+      "how_to": "After learning new material, review it the next day, then 3 days later, then weekly. Use flashcards or summaries."
+    },
+    {
+      "name": "Active Recall",
+      "duration": "30-45 min sessions",
+      "best_for": ["All behavior types", "Understanding-based courses"],
+      "learning_styles": ["reading", "practical"],
+      "description": "Test yourself on material instead of re-reading. Forces your brain to retrieve information actively.",
+      "how_to": "Close your notes. Write down everything you remember about a topic. Check what you missed. Repeat."
+    },
+    {
+      "name": "Feynman Technique",
+      "duration": "20-30 min per concept",
+      "best_for": ["Social Learners", "Complex subjects", "Deep understanding needed"],
+      "learning_styles": ["auditory", "practical"],
+      "description": "Explain a concept in simple terms as if teaching someone else. Reveals gaps in your understanding.",
+      "how_to": "Choose a concept. Explain it simply on paper. Identify gaps. Go back to source material. Simplify again."
+    },
+    {
+      "name": "Time Blocking",
+      "duration": "1-2 hour dedicated blocks per subject",
+      "best_for": ["Balanced Strategists", "Multiple courses", "Consistent Achievers"],
+      "learning_styles": ["visual", "reading"],
+      "description": "Assign specific time blocks to specific subjects. Prevents multitasking and ensures all courses get attention.",
+      "how_to": "Create a weekly calendar. Assign each course a fixed time slot. Treat these blocks like classes you cannot skip."
+    },
+    {
+      "name": "Mind Mapping",
+      "duration": "15-20 min per topic",
+      "best_for": ["Visual learners", "Connecting concepts", "Project planning"],
+      "learning_styles": ["visual"],
+      "description": "Create visual diagrams connecting related concepts. Excellent for seeing the big picture.",
+      "how_to": "Start with the main topic in the center. Branch out to subtopics. Add details and connections between branches."
+    },
+    {
+      "name": "Study Group Sessions",
+      "duration": "1-2 hours with structured agenda",
+      "best_for": ["Social Learners", "Difficult subjects", "Exam review"],
+      "learning_styles": ["auditory", "practical"],
+      "description": "Collaborative study with peers. Each member teaches a topic to the group.",
+      "how_to": "Form a group of 3-5 students. Each person prepares one topic. Take turns teaching. Discuss and ask questions."
+    },
+    {
+      "name": "Interleaving Practice",
+      "duration": "Mix subjects in 30-45 min blocks",
+      "best_for": ["Avoiding boredom", "Multiple exams coming", "Passive Observers wanting variety"],
+      "learning_styles": ["practical", "visual"],
+      "description": "Switch between different subjects or problem types within a study session instead of focusing on one.",
+      "how_to": "Study Subject A for 30 min, switch to Subject B for 30 min, then Subject C. This builds stronger connections."
+    }
+  ],
+  "schedule_templates": {
+    "light_load": {
+      "hours_per_day": 2,
+      "pattern": "1 Pomodoro cycle per subject, 2 subjects per day",
+      "rest_days": 2
+    },
+    "moderate_load": {
+      "hours_per_day": 4,
+      "pattern": "2 Pomodoro cycles per subject, 2-3 subjects per day",
+      "rest_days": 1
+    },
+    "heavy_load": {
+      "hours_per_day": 6,
+      "pattern": "Time blocking with 1.5hr blocks, 3-4 subjects per day",
+      "rest_days": 1
+    },
+    "exam_period": {
+      "hours_per_day": 8,
+      "pattern": "Spaced repetition + Active recall focus, 2-3 subjects per day",
+      "rest_days": 0
+    }
+  }
+}

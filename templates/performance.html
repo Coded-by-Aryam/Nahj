@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav_performance') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('perf_title') }}</h1>
+        <p class="page-subtitle">{{ t('perf_subtitle') }}</p>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <button class="btn btn-rose" onclick="document.getElementById('logSessionModal').classList.add('active')">{{ t('log_session_btn') }}</button>
+        <button class="btn btn-primary" id="aiAnalyzeBtn" onclick="runAIAnalysis()">{{ t('ai_analysis_btn') }}</button>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">⏱</div>
+        <div class="stat-value">{{ "%.1f"|format(total_hours) }}</div>
+        <div class="stat-label">{{ t('total_study_hours') }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-value">{{ completed }}</div>
+        <div class="stat-label">{{ t('stat_completed_tasks') }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">📈</div>
+        <div class="stat-value">{{ completion_rate }}%</div>
+        <div class="stat-label">{{ t('stat_completion_rate') }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon rose">📋</div>
+        <div class="stat-value">{{ total_tasks }}</div>
+        <div class="stat-label">{{ t('stat_total_tasks') }}</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ t('progress_overview') }}</h3>
+        </div>
+        <div style="margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-size:0.85rem; font-weight:500;">{{ t('task_completion') }}</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">{{ completion_rate }}%</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill green" style="width:{{ completion_rate }}%"></div></div>
+        </div>
+        <div style="margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-size:0.85rem; font-weight:500;">{{ t('study_consistency') }}</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">{{ "%.0f"|format(performance.consistency_score if performance else 0) }}%</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill rose" style="width:{{ performance.consistency_score if performance else 0 }}%"></div></div>
+        </div>
+        <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-size:0.85rem; font-weight:500;">{{ t('weekly_goal_label') }}</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);">{{ "%.1f"|format(total_hours) }}/20 {{ t('hours_short') }}</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill orange" style="width:{{ [total_hours / 20 * 100, 100]|min }}%"></div></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ t('ai_perf_analysis') }}</h3>
+        </div>
+        <div id="aiAnalysisResult">
+            {% if performance and performance.recommendation_text %}
+                <p style="font-size:0.88rem; line-height:1.8; color:var(--text-light); white-space:pre-wrap;">{{ performance.recommendation_text }}</p>
+            {% else %}
+                <div class="empty-state" style="padding:30px;">
+                    <div class="empty-state-icon">🤖</div>
+                    <p class="empty-state-text">{{ t('click_for_perf_analysis') }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">{{ t('recent_sessions') }}</h3>
+    </div>
+    {% if sessions %}
+    <div class="table-wrapper">
+        <table>
+            <thead><tr><th>{{ t('date') }}</th><th>{{ t('duration') }}</th></tr></thead>
+            <tbody>
+                {% for s in sessions %}
+                <tr><td>{{ s.date }}</td><td>{{ "%.1f"|format(s.duration_hours) }} {{ t('hours_short') }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="empty-state" style="padding:30px;"><p class="empty-state-text">{{ t('no_sessions_logged') }}</p></div>
+    {% endif %}
+</div>
+
+<div class="modal-overlay" id="logSessionModal">
+    <div class="modal">
+        <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">&times;</button>
+        <h2 class="modal-title">{{ t('log_session_title') }}</h2>
+        <form method="POST" action="{{ url_for('log_session') }}">
+            <div class="form-group">
+                <label class="form-label">{{ t('date') }}</label>
+                <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('study_hours_count') }}</label>
+                <input type="number" name="hours" class="form-control" step="0.5" min="0.5" max="16" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;">{{ t('log_session_submit') }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function runAIAnalysis() {
+    const btn = document.getElementById('aiAnalyzeBtn');
+    const result = document.getElementById('aiAnalysisResult');
+    btn.disabled = true;
+    btn.textContent = '{{ t('ai_analyzing_btn') }}';
+    result.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);">{{ t('ai_analyzing_perf') }}</div>';
+
+    try {
+        const res = await fetch('/api/ai/analyze-performance', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({})
+        });
+        const data = await res.json();
+        if (data.result) {
+            const formatted = data.result
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            result.innerHTML = '<div style="font-size:0.88rem;line-height:1.8;color:var(--text-light);">' + formatted + '</div>';
+        }
+    } catch(e) {
+        result.innerHTML = '<p style="color:var(--danger);text-align:center;padding:20px;">{{ t('check_api_key') }}</p>';
+    }
+    btn.disabled = false;
+    btn.textContent = '{{ t('ai_analysis_btn') }}';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav_tasks') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('tasks_title') }}</h1>
+        <p class="page-subtitle">{{ t('tasks_subtitle') }}</p>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('addTaskModal').classList.add('active')">{{ t('add_task') }}</button>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+    <a href="{{ url_for('tasks', status='all', priority=filter_priority) }}" class="filter-btn {% if filter_status == 'all' %}active{% endif %}">{{ t('all') }}</a>
+    <a href="{{ url_for('tasks', status='pending', priority=filter_priority) }}" class="filter-btn {% if filter_status == 'pending' %}active{% endif %}">{{ t('pending') }}</a>
+    <a href="{{ url_for('tasks', status='completed', priority=filter_priority) }}" class="filter-btn {% if filter_status == 'completed' %}active{% endif %}">{{ t('completed') }}</a>
+    <span style="margin:0 8px; color:var(--border)">|</span>
+    <a href="{{ url_for('tasks', status=filter_status, priority='all') }}" class="filter-btn {% if filter_priority == 'all' %}active{% endif %}">{{ t('all_priorities') }}</a>
+    <a href="{{ url_for('tasks', status=filter_status, priority='high') }}" class="filter-btn {% if filter_priority == 'high' %}active{% endif %}">{{ t('priority_high') }}</a>
+    <a href="{{ url_for('tasks', status=filter_status, priority='medium') }}" class="filter-btn {% if filter_priority == 'medium' %}active{% endif %}">{{ t('priority_medium') }}</a>
+    <a href="{{ url_for('tasks', status=filter_status, priority='low') }}" class="filter-btn {% if filter_priority == 'low' %}active{% endif %}">{{ t('priority_low') }}</a>
+</div>
+
+<!-- Task List -->
+{% if tasks %}
+    {% for task in tasks %}
+    <div class="task-item">
+        <form method="POST" action="{{ url_for('toggle_task', task_id=task.id) }}" style="display:inline;">
+            <button type="submit" class="task-checkbox {% if task.status == 'completed' %}checked{% endif %}" style="border:2px solid {% if task.status == 'completed' %}var(--success){% else %}var(--rose-dark){% endif %}; background:{% if task.status == 'completed' %}var(--success){% else %}transparent{% endif %};">
+                {% if task.status == 'completed' %}✓{% endif %}
+            </button>
+        </form>
+        <div class="task-info">
+            <div class="task-title {% if task.status == 'completed' %}completed{% endif %}">{{ task.title }}</div>
+            <div class="task-meta">
+                {% if task.deadline %}<span>📅 {{ task.deadline }}</span>{% endif %}
+                <span>📂 {{ task.type }}</span>
+                <span class="badge badge-{{ task.priority }}">{{ task.priority }}</span>
+                <span class="badge badge-{{ task.status }}">{{ task.status }}</span>
+            </div>
+            {% if task.description %}<p style="font-size:0.82rem; color:var(--text-light); margin-top:4px;">{{ task.description }}</p>{% endif %}
+        </div>
+        <div class="task-actions">
+            <button type="button" class="btn btn-sm btn-rose edit-task-btn"
+                data-id="{{ task.id }}"
+                data-title="{{ task.title|e }}"
+                data-desc="{{ task.description|e }}"
+                data-type="{{ task.type }}"
+                data-deadline="{{ task.deadline or '' }}"
+                data-priority="{{ task.priority }}"
+                data-status="{{ task.status }}">✏️</button>
+            <form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}" style="display:inline;" onsubmit="return confirm('{{ t('confirm_delete_task') }}')">
+                <button type="submit" class="btn btn-sm btn-danger">🗑</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p class="empty-state-text">{{ t('no_tasks') }}</p>
+    </div>
+{% endif %}
+
+<!-- Add Task Modal -->
+<div class="modal-overlay" id="addTaskModal">
+    <div class="modal">
+        <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">&times;</button>
+        <h2 class="modal-title">{{ t('add_new_task_title') }}</h2>
+        <form method="POST" action="{{ url_for('add_task') }}">
+            <div class="form-group">
+                <label class="form-label">{{ t('title') }} *</label>
+                <input type="text" name="title" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('description') }}</label>
+                <textarea name="description" class="form-control"></textarea>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label">{{ t('type') }}</label>
+                    <select name="type" class="form-control">
+                        <option value="assignment">{{ t('task_type_assignment') }}</option>
+                        <option value="exam">{{ t('task_type_exam') }}</option>
+                        <option value="project">{{ t('task_type_project') }}</option>
+                        <option value="quiz">{{ t('task_type_quiz') }}</option>
+                        <option value="other">{{ t('task_type_other') }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{{ t('priority') }}</label>
+                    <select name="priority" class="form-control">
+                        <option value="low">{{ t('priority_low_short') }}</option>
+                        <option value="medium" selected>{{ t('priority_medium_short') }}</option>
+                        <option value="high">{{ t('priority_high_short') }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('deadline') }}</label>
+                <input type="date" name="deadline" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;">{{ t('add_task_btn') }}</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal-overlay" id="editTaskModal">
+    <div class="modal">
+        <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">&times;</button>
+        <h2 class="modal-title">{{ t('edit_task_title') }}</h2>
+        <form method="POST" id="editTaskForm">
+            <div class="form-group">
+                <label class="form-label">{{ t('title') }} *</label>
+                <input type="text" name="title" id="editTitle" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('description') }}</label>
+                <textarea name="description" id="editDesc" class="form-control"></textarea>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label">{{ t('type') }}</label>
+                    <select name="type" id="editType" class="form-control">
+                        <option value="assignment">{{ t('task_type_assignment') }}</option>
+                        <option value="exam">{{ t('task_type_exam') }}</option>
+                        <option value="project">{{ t('task_type_project') }}</option>
+                        <option value="quiz">{{ t('task_type_quiz') }}</option>
+                        <option value="other">{{ t('task_type_other') }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{{ t('priority') }}</label>
+                    <select name="priority" id="editPriority" class="form-control">
+                        <option value="low">{{ t('priority_low_short') }}</option>
+                        <option value="medium">{{ t('priority_medium_short') }}</option>
+                        <option value="high">{{ t('priority_high_short') }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label">{{ t('deadline') }}</label>
+                    <input type="date" name="deadline" id="editDeadline" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{{ t('status') }}</label>
+                    <select name="status" id="editStatus" class="form-control">
+                        <option value="pending">{{ t('pending') }}</option>
+                        <option value="completed">{{ t('completed') }}</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;">{{ t('save_changes') }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.edit-task-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var d = btn.dataset;
+        document.getElementById('editTaskForm').action = '/tasks/edit/' + d.id;
+        document.getElementById('editTitle').value = d.title || '';
+        document.getElementById('editDesc').value = d.desc || '';
+        document.getElementById('editType').value = d.type || 'assignment';
+        document.getElementById('editDeadline').value = d.deadline || '';
+        document.getElementById('editPriority').value = d.priority || 'medium';
+        document.getElementById('editStatus').value = d.status || 'pending';
+        document.getElementById('editTaskModal').classList.add('active');
+    });
+});
+</script>
+{% endblock %}

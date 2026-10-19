@@ -1,0 +1,61 @@
+{
+  "function": "analyze_behavior",
+  "description": "Analyzes student study behavior and classifies their learning patterns",
+  "behavior_types": [
+    {
+      "type": "Consistent Achiever",
+      "traits": ["Regular study schedule", "Completes tasks on time", "High completion rate above 80%", "Studies 3+ hours daily"],
+      "description": "You maintain a strong and consistent study routine. You rarely miss deadlines and your performance is steady.",
+      "strengths": ["Time management", "Self-discipline", "Reliability"],
+      "risks": ["Burnout from overworking", "May avoid challenging tasks"],
+      "advice": "Keep your momentum but remember to take breaks. Try tackling harder subjects during your peak energy hours."
+    },
+    {
+      "type": "Night Owl Learner",
+      "traits": ["Studies mostly after 8pm", "Irregular morning activity", "May miss morning classes", "Productive in bursts"],
+      "description": "You are most productive during late hours. Your focus peaks at night but mornings can be challenging.",
+      "strengths": ["Deep focus during quiet hours", "Creative thinking", "Independent study"],
+      "risks": ["Sleep deprivation", "Missing morning deadlines", "Inconsistent schedule"],
+      "advice": "Protect your sleep schedule. Plan important tasks for your peak hours but ensure at least 7 hours of sleep."
+    },
+    {
+      "type": "Deadline Sprinter",
+      "traits": ["Completes most work near deadlines", "Low daily consistency", "High burst productivity", "Procrastination tendencies"],
+      "description": "You tend to work in intense bursts close to deadlines. While you get things done, this creates unnecessary stress.",
+      "strengths": ["Works well under pressure", "Can produce quality work quickly", "Adaptable"],
+      "risks": ["High stress levels", "Lower quality work", "Missing deadlines when overloaded"],
+      "advice": "Break large tasks into smaller daily chunks. Use the 2-day rule: start any task at least 2 days before the deadline."
+    },
+    {
+      "type": "Social Learner",
+      "traits": ["Active in study groups", "Prefers collaborative work", "Engages in community discussions", "Learns through teaching others"],
+      "description": "You thrive in collaborative environments and learn best when interacting with peers.",
+      "strengths": ["Communication skills", "Peer teaching", "Diverse perspectives"],
+      "risks": ["Dependency on group availability", "Distraction in social settings", "Difficulty with solo tasks"],
+      "advice": "Balance group study with individual review sessions. Join study groups that match your course load."
+    },
+    {
+      "type": "Passive Observer",
+      "traits": ["Low task completion rate below 40%", "Minimal study hours", "Few logged sessions", "Limited platform engagement"],
+      "description": "Your study activity is below the recommended level. You may be facing challenges that need attention.",
+      "strengths": ["Potential for improvement", "Awareness of gaps"],
+      "risks": ["Falling behind in courses", "Low academic performance", "Disconnection from academic goals"],
+      "advice": "Start with just 30 minutes of focused study daily. Set one small goal each day and gradually increase your commitment."
+    },
+    {
+      "type": "Balanced Strategist",
+      "traits": ["Moderate study hours 2-4 daily", "Mix of group and solo study", "Steady completion rate 60-80%", "Plans ahead but flexible"],
+      "description": "You maintain a healthy balance between studying, socializing, and rest. Your approach is sustainable.",
+      "strengths": ["Adaptability", "Balanced lifestyle", "Sustainable habits"],
+      "risks": ["May plateau without pushing limits", "Could be more efficient"],
+      "advice": "Consider optimizing your peak study hours. Try the Pomodoro technique to maximize your existing study time."
+    }
+  ],
+  "analysis_criteria": {
+    "study_hours_per_day": {"low": "0-1", "moderate": "2-4", "high": "5+"},
+    "completion_rate": {"low": "0-40%", "moderate": "40-80%", "high": "80-100%"},
+    "consistency": {"low": "studies fewer than 3 days/week", "moderate": "3-5 days/week", "high": "6-7 days/week"},
+    "session_timing": {"morning": "before 12pm", "afternoon": "12pm-6pm", "evening": "6pm-10pm", "night": "after 10pm"},
+    "group_engagement": {"low": "not in any groups", "moderate": "1-2 groups", "high": "3+ groups"}
+  }
+}

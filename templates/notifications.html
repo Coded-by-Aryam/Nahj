@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ t('notifs_title') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('notifs_title') }}</h1>
+        <p class="page-subtitle">{{ t('notifs_subtitle') }}</p>
+    </div>
+    {% if notifications %}
+    <div style="display:flex; gap:8px;">
+        <form method="POST" action="{{ url_for('mark_all_read') }}">
+            <button type="submit" class="btn btn-rose">{{ t('mark_all_read') }}</button>
+        </form>
+        <form method="POST" action="{{ url_for('delete_all_notifications') }}">
+            <button type="submit" class="btn btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="return confirm('{{ t('confirm_delete_all_notifs') }}')">{{ t('delete_all_notifs') }}</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+{% if notifications %}
+    {% for notif in notifications %}
+    <div class="notif-item {% if not notif.is_read %}unread{% endif %}" id="notif-{{ notif.id }}">
+        <div class="notif-dot"></div>
+        <div class="notif-content">
+            <div class="notif-message">{{ notif.message|localize_notif }}</div>
+            <div class="notif-time">{{ notif.created_at }} · {{ notif.type }}</div>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+            {% if not notif.is_read %}
+            <button class="btn btn-sm btn-rose" onclick="markRead({{ notif.id }}, this)">{{ t('mark_read') }}</button>
+            {% endif %}
+            <button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="deleteNotif({{ notif.id }}, this)" title="{{ t('delete') }}">🗑</button>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🔔</div>
+        <p class="empty-state-text">{{ t('no_notifs_empty') }}</p>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function markRead(id, btn) {
+    await fetch('/notifications/read/' + id, { method: 'POST' });
+    btn.closest('.notif-item').classList.remove('unread');
+    btn.remove();
+}
+
+async function deleteNotif(id, btn) {
+    const item = document.getElementById('notif-' + id);
+    item.style.opacity = '0.4';
+    try {
+        const res = await fetch('/notifications/delete/' + id, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            item.style.transition = 'all 0.3s';
+            item.style.height = item.offsetHeight + 'px';
+            item.style.overflow = 'hidden';
+            requestAnimationFrame(() => {
+                item.style.height = '0';
+                item.style.padding = '0';
+                item.style.margin = '0';
+            });
+            setTimeout(() => {
+                item.remove();
+                if (!document.querySelector('.notif-item')) location.reload();
+            }, 320);
+        } else {
+            item.style.opacity = '1';
+        }
+    } catch(e) {
+        item.style.opacity = '1';
+    }
+}
+</script>
+{% endblock %}

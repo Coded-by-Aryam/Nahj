@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ t('ai_rec_title') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('ai_rec_title') }}</h1>
+        <p class="page-subtitle">{{ t('ai_rec_subtitle') }}</p>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card" id="ai-chat-card">
+        <div class="card-header">
+            <h3 class="card-title">{{ t('ai_assistant') }}</h3>
+            <button class="btn btn-sm btn-rose" onclick="clearChat()">{{ t('clear_chat') }}</button>
+        </div>
+        <div id="ai-chat-area" style="height:420px; overflow-y:auto; padding:14px; background:var(--rose-light); border-radius:var(--radius-sm); margin-bottom:14px;">
+            <div class="ai-msg bot">
+                <div class="ai-avatar">🤖</div>
+                <div class="ai-bubble">{{ t('ai_greeting') }}</div>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="ai-input" class="form-control" placeholder="{{ t('ai_input_placeholder') }}" onkeypress="if(event.key==='Enter')sendChat()">
+            <button class="btn btn-primary" onclick="sendChat()">{{ t('send_btn') }}</button>
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('ai_functions') }}</h3>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-rose btn-block ai-func-btn" onclick="callAI('analyze-behavior', '{{ t('ai_func_behavior') }}')">{{ t('ai_func_behavior') }}</button>
+                <button class="btn btn-rose btn-block ai-func-btn" onclick="callAI('study-pattern', '{{ t('ai_func_study_pattern') }}')">{{ t('ai_func_study_pattern') }}</button>
+                <button class="btn btn-rose btn-block ai-func-btn" onclick="callAI('resources', '{{ t('ai_func_resources') }}')">{{ t('ai_func_resources') }}</button>
+                <button class="btn btn-rose btn-block ai-func-btn" onclick="callAI('recommendations', '{{ t('ai_func_recommendations') }}')">{{ t('ai_func_recommendations') }}</button>
+                <button class="btn btn-rose btn-block ai-func-btn" onclick="callAI('suggest-groups', '{{ t('ai_func_suggest_groups') }}')">{{ t('ai_func_suggest_groups') }}</button>
+                <button class="btn btn-rose btn-block ai-func-btn" onclick="callAI('match-group', '{{ t('ai_func_match_group') }}')">{{ t('ai_func_match_group') }}</button>
+                <button class="btn btn-rose btn-block ai-func-btn" onclick="callAI('analyze-performance', '{{ t('ai_func_perf') }}')">{{ t('ai_func_perf') }}</button>
+                <button class="btn btn-rose btn-block ai-func-btn" onclick="showReportModal()">{{ t('ai_func_report') }}</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('how_it_works') }}</h3>
+            </div>
+            <p style="font-size:0.82rem; color:var(--text-light); line-height:1.9;">
+                {{ t('how_it_works_text') }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="reportModal">
+    <div class="modal">
+        <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">&times;</button>
+        <h2 class="modal-title">{{ t('generate_report_title') }}</h2>
+        <div class="form-group">
+            <label class="form-label">{{ t('report_type') }}</label>
+            <select id="reportType" class="form-control">
+                <option value="weekly">{{ t('report_weekly') }}</option>
+                <option value="monthly">{{ t('report_monthly') }}</option>
+                <option value="semester">{{ t('report_semester') }}</option>
+            </select>
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="generateReport()">{{ t('generate') }}</button>
+    </div>
+</div>
+
+<style>
+.ai-msg{display:flex;gap:10px;margin-bottom:14px;align-items:flex-start}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.ai-msg.bot .ai-avatar{background:var(--rose)}
+.ai-msg.user .ai-avatar{background:var(--primary);color:#fff;font-size:.75rem;font-weight:700}
+.ai-bubble{background:var(--white);border-radius:12px;padding:12px 16px;font-size:.88rem;line-height:1.7;max-width:85%;box-shadow:0 1px 4px rgba(0,0,0,.06);white-space:pre-wrap}
+.ai-msg.user .ai-bubble{background:var(--primary);color:#fff}
+.ai-loading span{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--primary);margin:0 2px;animation:bounce 1.2s infinite}
+.ai-loading span:nth-child(2){animation-delay:.2s}
+.ai-loading span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
+.ai-func-btn{text-align:{% if dir == 'rtl' %}right{% else %}left{% endif %}!important;padding-{% if dir == 'rtl' %}right{% else %}left{% endif %}:18px!important}
+.ai-func-btn:disabled{opacity:.6;cursor:wait}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const chatArea=document.getElementById('ai-chat-area'),chatInput=document.getElementById('ai-input'),userInitial='{{session.get("username","م")[0]|upper}}';
+const T_RUN = '{{ t('running_label') }}';
+const T_ERR = '{{ t('something_went_wrong') }}';
+const T_CONN = '{{ t('connection_error') }}';
+const T_API = '{{ t('check_api_key') }}';
+const T_CLEARED = '{{ t('chat_cleared') }}';
+let chatHistory = [];
+function addMsg(t,isUser){const d=document.createElement('div');d.className='ai-msg '+(isUser?'user':'bot');d.innerHTML=`<div class="ai-avatar">${isUser?userInitial:'🤖'}</div><div class="ai-bubble">${fmt(t)}</div>`;chatArea.appendChild(d);chatArea.scrollTop=chatArea.scrollHeight}
+function addLoading(){const d=document.createElement('div');d.className='ai-msg bot';d.id='ai-loading';d.innerHTML=`<div class="ai-avatar">🤖</div><div class="ai-bubble"><div class="ai-loading"><span></span><span></span><span></span></div></div>`;chatArea.appendChild(d);chatArea.scrollTop=chatArea.scrollHeight}
+function removeLoading(){const e=document.getElementById('ai-loading');if(e)e.remove()}
+function fmt(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>')}
+function setBtns(d){document.querySelectorAll('.ai-func-btn').forEach(b=>b.disabled=d)}
+async function sendChat(){const m=chatInput.value.trim();if(!m)return;chatInput.value='';addMsg(m,true);chatHistory.push({role:'user',content:m});addLoading();setBtns(true);try{const r=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m,history:chatHistory.slice(-10)})});const d=await r.json();removeLoading();const reply=d.result||T_ERR;addMsg(reply,false);chatHistory.push({role:'assistant',content:reply})}catch(e){removeLoading();addMsg(T_CONN+' '+T_API,false)}setBtns(false)}
+async function callAI(ep,label){addMsg(T_RUN+' '+label,true);addLoading();setBtns(true);try{const r=await fetch('/api/ai/'+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});const d=await r.json();removeLoading();const reply=d.result||T_ERR;addMsg(reply,false);chatHistory.push({role:'user',content:T_RUN+' '+label},{role:'assistant',content:reply})}catch(e){removeLoading();addMsg(T_CONN+' '+T_API,false)}setBtns(false)}
+function showReportModal(){document.getElementById('reportModal').classList.add('active')}
+async function generateReport(){document.getElementById('reportModal').classList.remove('active');const rt=document.getElementById('reportType').value;addMsg(T_RUN+' 📝 '+rt,true);addLoading();setBtns(true);try{const r=await fetch('/api/ai/generate-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({report_type:rt})});const d=await r.json();removeLoading();const reply=d.result||T_ERR;addMsg(reply,false);chatHistory.push({role:'user',content:T_RUN+' '+rt},{role:'assistant',content:reply})}catch(e){removeLoading();addMsg(T_CONN,false)}setBtns(false)}
+function clearChat(){chatArea.innerHTML='<div class="ai-msg bot"><div class="ai-avatar">🤖</div><div class="ai-bubble">'+T_CLEARED+'</div></div>';chatHistory=[]}
+</script>
+{% endblock %}

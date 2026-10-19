@@ -1,0 +1,80 @@
+{
+  "function": "generate_report",
+  "description": "Generates comprehensive academic performance reports with insights and action plans",
+  "report_sections": [
+    {
+      "section": "Executive Summary",
+      "description": "Brief overview of overall academic standing and key highlights",
+      "includes": ["Overall performance score", "Key strengths", "Areas needing improvement", "Comparison to previous period"]
+    },
+    {
+      "section": "Study Habits Analysis",
+      "description": "Detailed breakdown of study behavior and patterns",
+      "includes": ["Total study hours this period", "Average daily study hours", "Most productive time of day", "Study consistency score", "Behavior type classification"]
+    },
+    {
+      "section": "Task Management Review",
+      "description": "Analysis of task completion and priority management",
+      "includes": ["Total tasks created vs completed", "Completion rate", "Average time to complete tasks", "Priority distribution", "Overdue tasks count"]
+    },
+    {
+      "section": "Course Performance",
+      "description": "Per-course analysis of engagement and progress",
+      "includes": ["Enrolled courses list", "Study time per course", "Task completion per course", "Recommended focus areas"]
+    },
+    {
+      "section": "Strengths & Achievements",
+      "description": "Positive highlights and accomplishments",
+      "includes": ["Top performing areas", "Improvement milestones", "Consistency streaks", "Community contributions"]
+    },
+    {
+      "section": "Areas for Improvement",
+      "description": "Specific areas that need attention with actionable suggestions",
+      "includes": ["Weakest metrics", "Missed deadlines analysis", "Inconsistency patterns", "Specific recommendations"]
+    },
+    {
+      "section": "Action Plan",
+      "description": "Concrete next steps for the upcoming period",
+      "includes": ["Top 3 priority actions", "Suggested study schedule changes", "Resource recommendations", "Group study suggestions"]
+    },
+    {
+      "section": "Goals for Next Period",
+      "description": "SMART goals for the next study period",
+      "includes": ["Study hours target", "Completion rate target", "Consistency target", "Specific course goals"]
+    }
+  ],
+  "report_templates": {
+    "weekly": {
+      "focus": "Short-term progress tracking",
+      "depth": "Brief but actionable",
+      "key_metrics": ["Tasks completed this week", "Study hours this week", "Upcoming deadlines"]
+    },
+    "monthly": {
+      "focus": "Medium-term trends and adjustments",
+      "depth": "Moderate with trend analysis",
+      "key_metrics": ["Monthly study hours", "Completion rate trend", "Consistency score trend", "Course-level breakdown"]
+    },
+    "semester": {
+      "focus": "Comprehensive semester review",
+      "depth": "Detailed with full analysis",
+      "key_metrics": ["Total study hours", "Overall completion rate", "Performance score progression", "All courses analysis", "Year-over-year comparison"]
+    }
+  },
+  "insight_patterns": {
+    "study_time_insight": {
+      "high": "You've logged impressive study hours. Make sure quality matches quantity — use active learning techniques.",
+      "medium": "Your study time is adequate. Consider adding 30 more minutes daily to boost performance.",
+      "low": "Your study hours are below recommended levels. Even small increases will show significant improvement."
+    },
+    "consistency_insight": {
+      "high": "Your consistent study routine is your biggest strength. This discipline will serve you well.",
+      "medium": "You study regularly but have some gaps. Try setting a fixed daily study alarm.",
+      "low": "Inconsistent study patterns are your main challenge. Focus on building a daily habit, even if short."
+    },
+    "task_insight": {
+      "high": "Excellent task management! You're staying on top of your work.",
+      "medium": "You complete most tasks but some slip through. Try reviewing your task list every morning.",
+      "low": "Task completion needs attention. Break large tasks into smaller steps and tackle one at a time."
+    }
+  }
+}

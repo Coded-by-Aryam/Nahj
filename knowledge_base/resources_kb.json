@@ -1,0 +1,140 @@
+{
+  "function": "recommend_resources",
+  "description": "Recommends learning resources tailored to courses and learning styles",
+  "resources_by_course": {
+    "Introduction to AI": {
+      "visual": [
+        {"title": "3Blue1Brown - Neural Networks", "type": "video", "url": "youtube.com/3blue1brown", "difficulty": "beginner"},
+        {"title": "AI Visualized - Google", "type": "interactive", "url": "ai.google/education", "difficulty": "beginner"}
+      ],
+      "auditory": [
+        {"title": "Lex Fridman AI Podcast", "type": "podcast", "url": "lexfridman.com/podcast", "difficulty": "intermediate"},
+        {"title": "AI Explained YouTube Channel", "type": "video lectures", "url": "youtube.com", "difficulty": "beginner"}
+      ],
+      "reading": [
+        {"title": "Artificial Intelligence: A Modern Approach", "type": "textbook", "url": "aima.cs.berkeley.edu", "difficulty": "intermediate"},
+        {"title": "Google AI Blog", "type": "articles", "url": "ai.googleblog.com", "difficulty": "intermediate"}
+      ],
+      "practical": [
+        {"title": "Kaggle Learn - Intro to AI", "type": "hands-on", "url": "kaggle.com/learn", "difficulty": "beginner"},
+        {"title": "Google Colab AI Notebooks", "type": "coding exercises", "url": "colab.research.google.com", "difficulty": "beginner"}
+      ]
+    },
+    "Data Structures": {
+      "visual": [
+        {"title": "VisuAlgo - Data Structures", "type": "interactive visualization", "url": "visualgo.net", "difficulty": "beginner"},
+        {"title": "CS Dojo YouTube", "type": "video", "url": "youtube.com/csdojo", "difficulty": "beginner"}
+      ],
+      "auditory": [
+        {"title": "MIT OCW Data Structures Lectures", "type": "lecture recordings", "url": "ocw.mit.edu", "difficulty": "intermediate"},
+        {"title": "Abdul Bari Algorithms", "type": "video lectures", "url": "youtube.com", "difficulty": "beginner"}
+      ],
+      "reading": [
+        {"title": "Introduction to Algorithms (CLRS)", "type": "textbook", "url": "mitpress.mit.edu", "difficulty": "advanced"},
+        {"title": "GeeksforGeeks DS Articles", "type": "articles", "url": "geeksforgeeks.org", "difficulty": "beginner"}
+      ],
+      "practical": [
+        {"title": "LeetCode Easy Problems", "type": "coding practice", "url": "leetcode.com", "difficulty": "beginner"},
+        {"title": "HackerRank Data Structures", "type": "coding challenges", "url": "hackerrank.com", "difficulty": "intermediate"}
+      ]
+    },
+    "Machine Learning": {
+      "visual": [
+        {"title": "StatQuest ML Videos", "type": "video", "url": "youtube.com/statquest", "difficulty": "beginner"},
+        {"title": "TensorFlow Playground", "type": "interactive", "url": "playground.tensorflow.org", "difficulty": "beginner"}
+      ],
+      "auditory": [
+        {"title": "Andrew Ng ML Course", "type": "lecture series", "url": "coursera.org", "difficulty": "intermediate"},
+        {"title": "Data Skeptic Podcast", "type": "podcast", "url": "dataskeptic.com", "difficulty": "intermediate"}
+      ],
+      "reading": [
+        {"title": "Hands-On ML with Scikit-Learn", "type": "textbook", "url": "oreilly.com", "difficulty": "intermediate"},
+        {"title": "Towards Data Science Blog", "type": "articles", "url": "towardsdatascience.com", "difficulty": "intermediate"}
+      ],
+      "practical": [
+        {"title": "Kaggle Competitions", "type": "hands-on projects", "url": "kaggle.com", "difficulty": "intermediate"},
+        {"title": "Scikit-Learn Tutorials", "type": "coding exercises", "url": "scikit-learn.org", "difficulty": "beginner"}
+      ]
+    },
+    "Web Development": {
+      "visual": [
+        {"title": "Traversy Media", "type": "video tutorials", "url": "youtube.com/traversymedia", "difficulty": "beginner"},
+        {"title": "Figma Design System", "type": "design tool", "url": "figma.com", "difficulty": "beginner"}
+      ],
+      "auditory": [
+        {"title": "Syntax.fm Podcast", "type": "podcast", "url": "syntax.fm", "difficulty": "intermediate"},
+        {"title": "freeCodeCamp YouTube", "type": "lecture videos", "url": "youtube.com/freecodecamp", "difficulty": "beginner"}
+      ],
+      "reading": [
+        {"title": "MDN Web Docs", "type": "documentation", "url": "developer.mozilla.org", "difficulty": "beginner"},
+        {"title": "JavaScript.info", "type": "tutorial site", "url": "javascript.info", "difficulty": "intermediate"}
+      ],
+      "practical": [
+        {"title": "freeCodeCamp Curriculum", "type": "coding exercises", "url": "freecodecamp.org", "difficulty": "beginner"},
+        {"title": "Frontend Mentor Challenges", "type": "projects", "url": "frontendmentor.io", "difficulty": "intermediate"}
+      ]
+    },
+    "Database Systems": {
+      "visual": [
+        {"title": "Database Design Tutorial", "type": "video", "url": "youtube.com", "difficulty": "beginner"},
+        {"title": "DB Diagram Tool", "type": "interactive", "url": "dbdiagram.io", "difficulty": "beginner"}
+      ],
+      "reading": [
+        {"title": "W3Schools SQL Tutorial", "type": "tutorial", "url": "w3schools.com/sql", "difficulty": "beginner"},
+        {"title": "SQLBolt Interactive Lessons", "type": "tutorial", "url": "sqlbolt.com", "difficulty": "beginner"}
+      ],
+      "practical": [
+        {"title": "SQL Zoo", "type": "coding exercises", "url": "sqlzoo.net", "difficulty": "beginner"},
+        {"title": "Mode Analytics SQL Tutorial", "type": "hands-on", "url": "mode.com", "difficulty": "intermediate"}
+      ]
+    },
+    "Software Engineering": {
+      "visual": [
+        {"title": "UML Diagrams Explained", "type": "video", "url": "youtube.com", "difficulty": "beginner"},
+        {"title": "Draw.io for Design", "type": "tool", "url": "draw.io", "difficulty": "beginner"}
+      ],
+      "reading": [
+        {"title": "Clean Code by Robert Martin", "type": "book", "url": "goodreads.com", "difficulty": "intermediate"},
+        {"title": "Refactoring Guru - Design Patterns", "type": "articles", "url": "refactoring.guru", "difficulty": "intermediate"}
+      ],
+      "practical": [
+        {"title": "GitHub Learning Lab", "type": "hands-on", "url": "github.com/skills", "difficulty": "beginner"},
+        {"title": "Build a Full Project", "type": "project-based", "url": "roadmap.sh", "difficulty": "intermediate"}
+      ]
+    },
+    "Computer Networks": {
+      "visual": [
+        {"title": "Networking Animated", "type": "video", "url": "youtube.com", "difficulty": "beginner"},
+        {"title": "Cisco Packet Tracer", "type": "simulation", "url": "netacad.com", "difficulty": "intermediate"}
+      ],
+      "reading": [
+        {"title": "Computer Networking: A Top-Down Approach", "type": "textbook", "url": "pearson.com", "difficulty": "intermediate"},
+        {"title": "Cloudflare Learning Center", "type": "articles", "url": "cloudflare.com/learning", "difficulty": "beginner"}
+      ],
+      "practical": [
+        {"title": "Wireshark Labs", "type": "hands-on", "url": "wireshark.org", "difficulty": "intermediate"},
+        {"title": "TryHackMe Networking", "type": "interactive", "url": "tryhackme.com", "difficulty": "beginner"}
+      ]
+    },
+    "Operating Systems": {
+      "visual": [
+        {"title": "OS Concepts Visualized", "type": "video", "url": "youtube.com", "difficulty": "beginner"},
+        {"title": "Process Scheduling Animations", "type": "interactive", "url": "os-book.com", "difficulty": "beginner"}
+      ],
+      "reading": [
+        {"title": "Operating System Concepts (Silberschatz)", "type": "textbook", "url": "os-book.com", "difficulty": "intermediate"},
+        {"title": "Linux Journey", "type": "tutorial", "url": "linuxjourney.com", "difficulty": "beginner"}
+      ],
+      "practical": [
+        {"title": "Linux Command Line Practice", "type": "hands-on", "url": "overthewire.org", "difficulty": "beginner"},
+        {"title": "xv6 OS Lab", "type": "project", "url": "pdos.csail.mit.edu/6.828/xv6", "difficulty": "advanced"}
+      ]
+    }
+  },
+  "general_resources": [
+    {"title": "Khan Academy", "type": "multi-subject", "url": "khanacademy.org"},
+    {"title": "Coursera", "type": "online courses", "url": "coursera.org"},
+    {"title": "edX", "type": "university courses", "url": "edx.org"},
+    {"title": "MIT OpenCourseWare", "type": "lecture materials", "url": "ocw.mit.edu"}
+  ]
+}

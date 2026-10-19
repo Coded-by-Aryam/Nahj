@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav_dashboard') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('dash_hello') }}، {{ session.get('username', '') }}!</h1>
+        <p class="page-subtitle">{{ t('dash_subtitle') }}</p>
+    </div>
+    <a href="{{ url_for('planner') }}" class="btn btn-primary">{{ t('dash_create_plan') }}</a>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon rose">📚</div>
+        <div class="stat-value">{{ enrolled_courses }}</div>
+        <div class="stat-label">{{ t('stat_enrolled_courses') }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue">📋</div>
+        <div class="stat-value">{{ total_tasks }}</div>
+        <div class="stat-label">{{ t('stat_total_tasks') }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-value">{{ completed_tasks }}</div>
+        <div class="stat-label">{{ t('stat_completed_tasks') }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">📈</div>
+        <div class="stat-value">{{ completion_rate }}%</div>
+        <div class="stat-label">{{ t('stat_completion_rate') }}</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Upcoming Tasks -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ t('upcoming_tasks') }}</h3>
+            <a href="{{ url_for('tasks') }}" class="btn btn-sm btn-rose">{{ t('view_all') }}</a>
+        </div>
+        {% if upcoming %}
+            {% for task in upcoming %}
+            <div class="task-item">
+                <div class="task-checkbox {% if task.status == 'completed' %}checked{% endif %}">
+                    {% if task.status == 'completed' %}✓{% endif %}
+                </div>
+                <div class="task-info">
+                    <div class="task-title {% if task.status == 'completed' %}completed{% endif %}">{{ task.title }}</div>
+                    <div class="task-meta">
+                        <span>📅 {{ task.deadline if task.deadline else t('no_deadline') }}</span>
+                        <span class="badge badge-{{ task.priority }}">{{ task.priority }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p class="empty-state-text">{{ t('no_upcoming_tasks') }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <!-- AI Quick Insight -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('ai_quick_insight') }}</h3>
+                <button class="btn btn-sm btn-rose" id="insightBtn" onclick="getQuickInsight()">{{ t('refresh') }}</button>
+            </div>
+            <div id="quickInsight" style="font-size:0.88rem; line-height:1.8; color:var(--text-light); min-height:60px;">
+                {{ t('click_refresh_for_insight') }}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('quick_actions') }}</h3>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <a href="{{ url_for('tasks') }}" class="btn btn-rose btn-block">{{ t('add_new_task') }}</a>
+                <a href="{{ url_for('recommendations') }}" class="btn btn-rose btn-block">{{ t('nav_recommendations') }}</a>
+                <a href="{{ url_for('performance') }}" class="btn btn-rose btn-block">{{ t('view_performance') }}</a>
+                <a href="{{ url_for('community') }}" class="btn btn-rose btn-block">{{ t('nav_community') }}</a>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('recent_notifications') }}</h3>
+            </div>
+            {% if notifications %}
+                {% for notif in notifications %}
+                <div class="notif-item {% if not notif.is_read %}unread{% endif %}" style="padding:10px;">
+                    <div class="notif-dot"></div>
+                    <div class="notif-content">
+                        <div class="notif-message" style="font-size:0.82rem;">{{ notif.message|localize_notif }}</div>
+                        <div class="notif-time">{{ notif.created_at }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.85rem;">{{ t('no_notifications_yet') }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function getQuickInsight() {
+    const el = document.getElementById('quickInsight');
+    const btn = document.getElementById('insightBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    el.innerHTML = '<span style="color:var(--text-muted);">{{ t('ai_analyzing') }}</span>';
+
+    const isAr = window.NAHJ_LANG === 'ar';
+    const promptMsg = isAr
+        ? 'أعطني ملخصاً موجزاً (3-4 جمل) لوضعي الأكاديمي الحالي، مع إبراز نقطة قوة واحدة وجانب يحتاج تحسيناً. كن مختصراً ومشجعاً.'
+        : 'Give me a brief 3-4 sentence summary of my current academic status, highlighting one strength and one area to improve. Be concise and encouraging.';
+
+    try {
+        const res = await fetch('/api/ai/chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: promptMsg})
+        });
+        const data = await res.json();
+        if (data.result) {
+            el.innerHTML = data.result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        }
+    } catch(e) {
+        el.textContent = '{{ t('load_failed_check_api') }}';
+    }
+    btn.disabled = false;
+    btn.textContent = '{{ t('refresh') }}';
+}
+</script>
+{% endblock %}

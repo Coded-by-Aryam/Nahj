@@ -1,0 +1,105 @@
+{
+  "function": "generate_recommendations",
+  "description": "Generates hybrid personalized recommendations combining behavior, resources, and performance",
+  "recommendation_rules": {
+    "low_performance_low_hours": {
+      "priority": "critical",
+      "message": "Your study hours and performance are both below target. Let's build a foundation.",
+      "actions": [
+        "Start with 30-minute daily study sessions and gradually increase",
+        "Focus on one subject at a time — avoid multitasking",
+        "Use Active Recall to make the most of limited study time",
+        "Set 3 small achievable goals each day",
+        "Visit office hours or ask peers for help on difficult topics"
+      ]
+    },
+    "low_performance_high_hours": {
+      "priority": "high",
+      "message": "You're putting in the hours but results aren't matching your effort. Let's improve your study efficiency.",
+      "actions": [
+        "Switch from passive reading to Active Recall and self-testing",
+        "Try the Feynman Technique to identify gaps in understanding",
+        "Take regular breaks — use Pomodoro Technique (25/5 pattern)",
+        "Review your notes within 24 hours of each lecture",
+        "Focus on understanding concepts rather than memorizing"
+      ]
+    },
+    "high_performance_low_hours": {
+      "priority": "moderate",
+      "message": "You're performing well with minimal study time. Great efficiency! But there's room to grow.",
+      "actions": [
+        "Challenge yourself with advanced problems or bonus assignments",
+        "Help peers through study groups — teaching deepens understanding",
+        "Explore supplementary resources beyond the syllabus",
+        "Consider research projects or extra-curricular academic activities",
+        "Build a portfolio of projects related to your courses"
+      ]
+    },
+    "high_performance_high_hours": {
+      "priority": "low",
+      "message": "Excellent work! You're dedicated and achieving results. Focus on maintaining balance.",
+      "actions": [
+        "Monitor for burnout — ensure you have rest days",
+        "Mentor other students in study groups",
+        "Explore research or internship opportunities",
+        "Set long-term academic goals beyond this semester",
+        "Diversify your study techniques to stay engaged"
+      ]
+    },
+    "inconsistent_pattern": {
+      "priority": "high",
+      "message": "Your study pattern is inconsistent. Building a routine will significantly improve your results.",
+      "actions": [
+        "Set a fixed daily study time and treat it like a class",
+        "Use Time Blocking to allocate specific hours to each subject",
+        "Track your study sessions daily — accountability helps consistency",
+        "Start small: 2 consistent hours are better than 6 inconsistent ones",
+        "Remove distractions during study blocks — use app blockers if needed"
+      ]
+    },
+    "deadline_approaching": {
+      "priority": "urgent",
+      "message": "You have upcoming deadlines. Let's prioritize your tasks.",
+      "actions": [
+        "List all tasks due this week and sort by deadline",
+        "Focus on high-priority tasks first",
+        "Break large tasks into smaller subtasks",
+        "Allocate focused 2-hour blocks for each major task",
+        "Ask for extensions early if you're overwhelmed — professors appreciate honesty"
+      ]
+    }
+  },
+  "success_strategies": {
+    "exam_preparation": [
+      "Start reviewing at least 7 days before the exam",
+      "Create summary sheets for each chapter",
+      "Practice with past exams and sample questions",
+      "Use spaced repetition for key definitions and formulas",
+      "Get adequate sleep — at least 7 hours before exam day"
+    ],
+    "assignment_completion": [
+      "Read the entire assignment brief before starting",
+      "Break the assignment into milestones with mini-deadlines",
+      "Start with the hardest part when your energy is highest",
+      "Proofread and review before submitting",
+      "Use a checklist to ensure all requirements are met"
+    ],
+    "project_management": [
+      "Define clear roles and responsibilities for team projects",
+      "Set weekly milestones and check-ins",
+      "Use version control for code projects",
+      "Document your work as you go — don't leave it for the end",
+      "Plan for buffer time — unexpected issues always arise"
+    ]
+  },
+  "motivation_tips": [
+    "Remember your WHY — why did you choose this field?",
+    "Celebrate small wins — every completed task is progress",
+    "Visualize your future self graduating and succeeding",
+    "Connect with motivated peers who push you forward",
+    "Track your progress — seeing improvement is motivating",
+    "Take care of your health — exercise, eat well, sleep enough",
+    "When feeling stuck, switch to a different subject or take a walk",
+    "Set rewards for completing difficult tasks"
+  ]
+}

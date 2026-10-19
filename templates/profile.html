@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav_profile') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('profile_title') }}</h1>
+        <p class="page-subtitle">{{ t('profile_subtitle') }}</p>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Profile Info -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ t('personal_info') }}</h3>
+        </div>
+        <form method="POST" action="{{ url_for('profile') }}">
+            <div class="form-group">
+                <label class="form-label">{{ t('username') }}</label>
+                <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('email_readonly') }}</label>
+                <input type="email" class="form-control" value="{{ user.email }}" disabled style="background:var(--rose-light);">
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('phone') }}</label>
+                <input type="tel" name="phone" class="form-control" value="{{ user.phone or '' }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('department') }}</label>
+                <select name="department" class="form-control">
+                    <option value="">{{ t('choose_department') }}</option>
+                    <option value="CS & AI" {% if user.department == 'CS & AI' %}selected{% endif %}>{{ t('dep_cs_ai') }}</option>
+                    <option value="Data Science" {% if user.department == 'Data Science' %}selected{% endif %}>{{ t('dep_data') }}</option>
+                    <option value="Software Engineering" {% if user.department == 'Software Engineering' %}selected{% endif %}>{{ t('dep_se') }}</option>
+                    <option value="Cybersecurity" {% if user.department == 'Cybersecurity' %}selected{% endif %}>{{ t('dep_cyber') }}</option>
+                    <option value="Computer Engineering" {% if user.department == 'Computer Engineering' %}selected{% endif %}>{{ t('dep_ce') }}</option>
+                </select>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label">{{ t('academic_level') }}</label>
+                    <select name="level" class="form-control">
+                        {% for i in range(1, 9) %}
+                        <option value="{{ i }}" {% if user.level == i %}selected{% endif %}>{{ t('level') }} {{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{{ t('learning_style') }}</label>
+                    <select name="learning_style" class="form-control">
+                        <option value="">{{ t('choose_style') }}</option>
+                        <option value="visual" {% if user.learning_style == 'visual' %}selected{% endif %}>{{ t('style_visual') }}</option>
+                        <option value="auditory" {% if user.learning_style == 'auditory' %}selected{% endif %}>{{ t('style_auditory') }}</option>
+                        <option value="reading" {% if user.learning_style == 'reading' %}selected{% endif %}>{{ t('style_reading') }}</option>
+                        <option value="practical" {% if user.learning_style == 'practical' %}selected{% endif %}>{{ t('style_practical') }}</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:10px;">{{ t('save_changes') }}</button>
+        </form>
+    </div>
+
+    <!-- Change Password -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('change_password') }}</h3>
+            </div>
+            <form method="POST" action="{{ url_for('change_password') }}">
+                <div class="form-group">
+                    <label class="form-label">{{ t('current_password') }}</label>
+                    <input type="password" name="old_password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{{ t('new_password') }}</label>
+                    <input type="password" name="new_password" class="form-control" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-outline" style="margin-top:10px;">{{ t('change_pwd_btn') }}</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ t('account_summary') }}</h3>
+            </div>
+            <div style="font-size:0.88rem; color:var(--text-light); line-height:2;">
+                <p>{{ t('joined_at') }} {{ user.created_at }}</p>
+                <p>{{ t('last_login_label') }} {{ user.last_login or t('not_available') }}</p>
+                <p>{{ t('department_label') }} {{ user.department or t('not_set') }}</p>
+                <p>{{ t('level_label') }} {{ user.level }}</p>
+                <p>{{ t('learning_style_label') }} {{ user.learning_style or t('not_set') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

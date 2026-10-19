@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}{{ t('community_title') }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ t('community_title') }}</h1>
+        <p class="page-subtitle">{{ t('community_subtitle') }}</p>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('posts', this)">{{ t('tab_posts') }}</button>
+    <button class="tab-btn" onclick="switchTab('groups', this)">{{ t('tab_groups') }}</button>
+</div>
+
+<!-- Posts Tab -->
+<div class="tab-content active" id="tab-posts">
+    <!-- New Post -->
+    <div class="card" style="margin-bottom:24px;">
+        <form method="POST" action="{{ url_for('create_post') }}">
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div class="post-avatar">{{ session.get('username', 'م')[0]|upper }}</div>
+                <div style="flex:1;">
+                    <textarea name="content" class="form-control" placeholder="{{ t('share_with_community') }}" rows="3" required></textarea>
+                    <button type="submit" class="btn btn-primary btn-sm" style="margin-top:10px;">{{ t('publish') }}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Posts List -->
+    {% if posts %}
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-avatar">{{ post.username[0]|upper }}</div>
+                <div>
+                    <div class="post-author">{{ post.username }}</div>
+                    <div class="post-time">{{ post.created_at }}</div>
+                </div>
+            </div>
+            <div class="post-content">{{ post.content }}</div>
+            <div class="post-footer">
+                <span style="font-size:0.82rem; color:var(--text-muted);">💬 {{ post.comment_count }} {{ t('comments_count') }}</span>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn btn-sm btn-rose" onclick="toggleComments({{ post.id }})">{{ t('reply') }}</button>
+                    {% if post.user_id == session.get('user_id') %}
+                    <button class="btn btn-sm btn-danger" onclick="deletePost(this, {{ post.id }})">🗑 {% if lang == 'ar' %}حذف{% else %}Delete{% endif %}</button>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Comment Section -->
+            <div id="comments-{{ post.id }}" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
+                {% if post.comments %}
+                    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+                    {% for c in post.comments %}
+                        <div style="display:flex; gap:10px; align-items:flex-start;">
+                            <div class="post-avatar" style="width:32px; height:32px; font-size:0.85rem;">{{ c.username[0]|upper }}</div>
+                            <div style="flex:1; background:var(--bg-muted, #f5f5f5); padding:8px 12px; border-radius:10px;">
+                                <div style="font-weight:600; font-size:0.85rem;">{{ c.username }}</div>
+                                <div style="font-size:0.9rem;">{{ c.content }}</div>
+                                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">{{ c.created_at }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+                <form method="POST" action="{{ url_for('add_comment', post_id=post.id) }}" style="display:flex; gap:10px;">
+                    <input type="text" name="content" class="form-control" placeholder="{{ t('write_comment') }}" required>
+                    <button type="submit" class="btn btn-sm btn-primary">{{ t('send') }}</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <p class="empty-state-text">{{ t('no_posts') }}</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Groups Tab -->
+<div class="tab-content" id="tab-groups">
+    <div style="margin-bottom:20px;">
+        <button class="btn btn-primary" onclick="document.getElementById('createGroupModal').classList.add('active')">{{ t('create_group_btn') }}</button>
+    </div>
+
+    {% if groups %}
+    <div class="groups-grid" id="groups-grid">
+        {% for group in groups %}
+        <div class="group-card" id="group-card-{{ group.id }}" data-creator="{{ 1 if group.created_by == session.get('user_id') else 0 }}">
+            <div class="group-name">{{ group.group_name }}</div>
+            <div class="group-info">
+                {% if group.department %}🏫 {{ group.department }}<br>{% endif %}
+                🎚️ {{ t('level') }} {{ group.level }}<br>
+                👥 <span class="group-count-{{ group.id }}">{{ group.member_count }}</span>/{{ group.capacity }} {{ t('members') }}<br>
+                {% if group.description %}📝 {{ group.description }}{% endif %}
+            </div>
+            <div id="group-actions-{{ group.id }}">
+            {% if group.is_member %}
+                <a href="{{ url_for('group_detail', group_id=group.id) }}" class="btn btn-sm btn-primary">{{ t('open') }}</a>
+                <button onclick="leaveGroup(this, {{ group.id }})" class="btn btn-sm btn-outline">{{ t('leave_group') }}</button>
+                <span class="badge badge-completed" style="margin-{% if dir == 'rtl' %}right{% else %}left{% endif %}:6px;">{{ t('member_badge') }}</span>
+            {% else %}
+                <button onclick="joinGroup(this, {{ group.id }})" class="btn btn-sm btn-primary">{{ t('join_group_btn') }}</button>
+            {% endif %}
+            {% if group.created_by == session.get('user_id') %}
+                <button onclick="deleteGroup(this, {{ group.id }})" class="btn btn-sm btn-danger" style="margin-top:8px; display:block;">🗑 {% if lang == 'ar' %}حذف المجموعة{% else %}Delete Group{% endif %}</button>
+            {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <p class="empty-state-text">{{ t('no_groups') }}</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Create Group Modal -->
+<div class="modal-overlay" id="createGroupModal">
+    <div class="modal">
+        <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">&times;</button>
+        <h2 class="modal-title">{{ t('create_group_title') }}</h2>
+        <form method="POST" action="{{ url_for('create_group') }}">
+            <div class="form-group">
+                <label class="form-label">{{ t('group_name') }} *</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('department') }}</label>
+                <input type="text" name="department" class="form-control" placeholder="CS & AI">
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('group_description') }}</label>
+                <textarea name="description" class="form-control" placeholder="{{ t('group_topic_placeholder') }}"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('level') }}</label>
+                <select name="level" class="form-control">
+                    {% for lv in range(1, 9) %}
+                        <option value="{{ lv }}" {% if lv == user_level %}selected{% endif %}>{{ t('level') }} {{ lv }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ t('group_capacity') }}</label>
+                <input type="number" name="capacity" class="form-control" value="10" min="2" max="50">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;">{{ t('create_group_submit') }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const T_JOIN_BTN   = '{{ t("join_group_btn") }}';
+const T_OPEN_BTN   = '{{ t("open") }}';
+const T_LEAVE_BTN  = '{{ t("leave_group") }}';
+const T_MEMBER_BADGE = '{{ t("member_badge") }}';
+const T_MEMBERS    = '{{ t("members") }}';
+const T_DELETE_GROUP = '{% if lang == "ar" %}حذف المجموعة{% else %}Delete Group{% endif %}';
+const DIR          = '{{ dir }}';
+
+// The creator's delete button must survive AJAX join/leave re-renders.
+function deleteBtnHtml(groupId) {
+    const card = document.getElementById('group-card-' + groupId);
+    if (!card || card.dataset.creator !== '1') return '';
+    return `<button onclick="deleteGroup(this, ${groupId})" class="btn btn-sm btn-danger" style="margin-top:8px; display:block;">🗑 ${T_DELETE_GROUP}</button>`;
+}
+
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    btn.classList.add('active');
+    history.replaceState(null, '', '#' + tabId);
+}
+
+// Open the groups tab when arriving with #groups (e.g. after creating a group
+// or coming back from a group page), and keep it active across auto-reloads.
+function activateTabFromHash() {
+    if (location.hash === '#groups') {
+        const btn = document.querySelector('.tab-btn[onclick*="groups"]');
+        if (btn) switchTab('groups', btn);
+    }
+}
+activateTabFromHash();
+
+function toggleComments(postId) {
+    const el = document.getElementById('comments-' + postId);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+async function joinGroup(btn, groupId) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+        const res = await fetch('/community/group/join/' + groupId, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            const actionsDiv = document.getElementById('group-actions-' + groupId);
+            const margin = DIR === 'rtl' ? 'margin-right' : 'margin-left';
+            actionsDiv.innerHTML =
+                `<a href="/community/group/${groupId}" class="btn btn-sm btn-primary">${T_OPEN_BTN}</a> ` +
+                `<button onclick="leaveGroup(this, ${groupId})" class="btn btn-sm btn-outline">${T_LEAVE_BTN}</button> ` +
+                `<span class="badge badge-completed" style="${margin}:6px;">${T_MEMBER_BADGE}</span>` +
+                deleteBtnHtml(groupId);
+            const countEl = document.querySelector('.group-count-' + groupId);
+            if (countEl && data.new_count !== undefined) countEl.textContent = data.new_count;
+        } else {
+            btn.disabled = false;
+            btn.textContent = T_JOIN_BTN;
+        }
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = T_JOIN_BTN;
+    }
+}
+
+async function leaveGroup(btn, groupId) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+        const res = await fetch('/community/group/leave/' + groupId, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            const actionsDiv = document.getElementById('group-actions-' + groupId);
+            actionsDiv.innerHTML =
+                `<button onclick="joinGroup(this, ${groupId})" class="btn btn-sm btn-primary">${T_JOIN_BTN}</button>` +
+                deleteBtnHtml(groupId);
+            const countEl = document.querySelector('.group-count-' + groupId);
+            if (countEl && data.new_count !== undefined) countEl.textContent = data.new_count;
+        } else {
+            btn.disabled = false;
+            btn.textContent = T_LEAVE_BTN;
+        }
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = T_LEAVE_BTN;
+    }
+}
+
+async function deletePost(btn, postId) {
+    if (!confirm('{% if lang == "ar" %}هل أنت متأكد من حذف هذا المنشور؟{% else %}Delete this post?{% endif %}')) return;
+    btn.disabled = true;
+    try {
+        const res = await fetch('/community/post/delete/' + postId, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            btn.closest('.post-card').remove();
+        } else {
+            btn.disabled = false;
+        }
+    } catch(e) {
+        btn.disabled = false;
+    }
+}
+
+async function deleteGroup(btn, groupId) {
+    if (!confirm('{% if lang == "ar" %}هل أنت متأكد من حذف هذه المجموعة؟ سيتم حذف جميع الرسائل والأعضاء.{% else %}Delete this group? All messages and members will be removed.{% endif %}')) return;
+    btn.disabled = true;
+    try {
+        const res = await fetch('/community/group/delete/' + groupId, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('group-card-' + groupId).remove();
+        } else {
+            btn.disabled = false;
+        }
+    } catch(e) {
+        btn.disabled = false;
+    }
+}
+
+// Auto-refresh every 30 s so all users see new posts/groups without manual reload
+setInterval(function() {
+    const modalOpen = document.querySelector('.modal-overlay.active');
+    const focused = document.activeElement;
+    const typing = focused && (focused.tagName === 'TEXTAREA' || focused.tagName === 'INPUT');
+    if (!modalOpen && !typing) location.reload();
+}, 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ group.group_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ group.group_name }}</h1>
+        <p class="page-subtitle">
+            {% if group.department %}🏫 {{ group.department }} &nbsp;{% endif %}
+            🎚️ {{ t('level') }} {{ group.level }} &nbsp;
+            👥 {{ members|length }}/{{ group.capacity }} {{ t('members') }}
+        </p>
+    </div>
+    <a href="{{ url_for('community') }}#groups" class="btn btn-sm btn-outline">{{ t('back_to_community') }}</a>
+</div>
+
+{% if group.description %}
+<div class="card" style="margin-bottom:20px;">
+    <div style="font-size:0.95rem;">📝 {{ group.description }}</div>
+</div>
+{% endif %}
+
+<div style="display:grid; grid-template-columns: 1fr 2fr; gap:20px;">
+    <!-- Members -->
+    <div class="card">
+        <h3 style="margin-top:0;">{{ t('members_heading') }}</h3>
+        {% for m in members %}
+        <div style="display:flex; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+            <div class="post-avatar">{{ m.username[0]|upper }}</div>
+            <div style="flex:1;">
+                <div style="font-weight:600;">{{ m.username }}</div>
+                <div style="font-size:0.78rem; color:var(--text-muted);">
+                    {% if m.department %}{{ m.department }} · {% endif %}{{ t('level') }} {{ m.level }}
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">
+                    {% if m.email %}<a href="mailto:{{ m.email }}">📧 {{ m.email }}</a>{% endif %}
+                    {% if m.phone %}<br>📱 {{ m.phone }}{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Group Chat -->
+    <div class="card">
+        <h3 style="margin-top:0;">{{ t('group_chat') }}</h3>
+        <div id="chat-box" style="max-height:420px; overflow-y:auto; padding:10px; background:var(--bg-muted, #f7f7f7); border-radius:10px; margin-bottom:14px;">
+            {% if messages %}
+                {% for msg in messages %}
+                <div style="margin-bottom:12px;">
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <div class="post-avatar" style="width:28px; height:28px; font-size:0.78rem;">{{ msg.username[0]|upper }}</div>
+                        <div style="font-weight:600; font-size:0.85rem;">{{ msg.username }}</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted);">{{ msg.created_at }}</div>
+                    </div>
+                    <div style="margin-{% if dir == 'rtl' %}right{% else %}left{% endif %}:36px; font-size:0.92rem;">{{ msg.content }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align:center; color:var(--text-muted); padding:30px 10px;">
+                    {{ t('no_messages_yet') }}
+                </div>
+            {% endif %}
+        </div>
+        <form method="POST" action="{{ url_for('group_message', group_id=group.id) }}" style="display:flex; gap:10px;">
+            <input type="text" name="content" class="form-control" placeholder="{{ t('write_message') }}" required>
+            <button type="submit" class="btn btn-primary">{{ t('send') }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const chatBox = document.getElementById('chat-box');
+if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+
+// Auto-refresh every 15 seconds so all members see new messages
+setInterval(function() {
+    const focused = document.activeElement;
+    const typing = focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA');
+    if (!typing) {
+        location.reload();
+    }
+}, 15000);
+</script>
+{% endblock %}
